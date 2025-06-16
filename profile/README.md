@@ -6,27 +6,30 @@ An open-source, comprehensive developer platform for the Monad blockchain ecosys
 
 The Monad Developer Hub consists of four main components:
 
-```
-┌─────────────────────┐    ┌─────────────────────┐
-│   Frontend          │────│   Backend           │
-│   (Next.js)         │    │   (Go)              │
-└─────────────────────┘    └─────────────────────┘
-            │                          │
-            └────────┬───────────----──┘
-                     │
-        ┌─────────────────────┐    ┌─────────────────────┐
-        │ Indexer Interface   │    │ Ponder Indexer      │
-        │ (Go)                │────│   (TypeScript)      │
-        │ indexer-interface   │    │  ponder-indexer     │
-        └─────────────────────┘    └─────────────────────┘
-```
+![image](https://github.com/user-attachments/assets/f6f99267-6201-469c-baf3-86732d71cec2)
 
-### 📦 Components
+#### 📦 Components
 
 - **[frontend](./frontend/)** - Modern Next.js frontend with analytics dashboards
 - **[backend](./backend/)** - Go REST API for project management and data
 - **[ponder-indexer](./ponder-indexer/)** - Real-time blockchain indexer built with Ponder
 - **[indexer-interface](./indexer-interface/)** - Interface service for indexed data
+
+### Problem, Solution & Reasoning:
+
+**1. Monad is FAST but not with my VPS:** This creates a bottleneck when I try to index Monad transactions and blocks to the database. The cost to read and write to the database is too high. The solution is to directly send all transactions via WebSocket to indexer-interface from Ponder. No read-write delay, all the data is realtime, network latency is the only limit!
+
+**2. ENVIO is fast but doesn't allow us to listen on each block:** This doesn't align with our plan - we need to listen on each block, count each transaction, and sort them. The solution is to use Ponder for the real-time listener, and Envio to handle historical tracking of contracts, which will be used for Top Contract calculation.
+
+**3. RPC calls are expensive *at least for me* & we want to simplify our multiple indexers to be fetched from 1 source:** Indexer-interface helps centralize the calls and data processing while reducing the use of RPC calls. It's also helpful for handling multiple clients at once without affecting our indexer performance.
+
+**4. Network bottleneck and client rendering aesthetics:** How the indexer-interface works is it broadcasts as fast as possible on each arrival of parsed data from the indexer to all clients that subscribe to specific WebSocket events. But the server is only in one region - if it's accessed from far away, there will be delayed processing. 
+
+This creates unaesthetic visualization; sometimes it's too fast, sometimes it's too slow. The inconsistent timing makes the transaction flow look choppy and unprofessional.
+
+To achieve better results, we need a Dynamic Delay Function, which will queue the rendering. If there's a lot of data to render, it will shorten the delay of each transaction to display. If there are few transactions, it will lengthen the delay of each transaction to display. 
+
+This will compensate for the network latency we experience and display beautiful dots while minimizing "silent empty rendering."
 
 ## ✨ Features
 
