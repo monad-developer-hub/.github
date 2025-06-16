@@ -8,15 +8,15 @@ The Monad Developer Hub consists of four main components:
 
 ```
 ┌─────────────────────┐    ┌─────────────────────┐
-│   Frontend (Next.js) │────│   Backend (Go)      │
-│   frontend          │    │   backend           │
+│   Frontend          │────│   Backend           │
+│   (Next.js)         │    │   (Go)              │
 └─────────────────────┘    └─────────────────────┘
             │                          │
-            └──────────────┬──────────────┘
-                          │
+            └────────┬───────────----──┘
+                     │
         ┌─────────────────────┐    ┌─────────────────────┐
-        │ Indexer Interface   │────│  Ponder Indexer     │
-        │ (Go)                │    │  (TypeScript)       │
+        │ Indexer Interface   │    │ Ponder Indexer      │
+        │ (Go)                │────│   (TypeScript)      │
         │ indexer-interface   │    │  ponder-indexer     │
         └─────────────────────┘    └─────────────────────┘
 ```
